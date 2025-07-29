@@ -1,0 +1,76 @@
+.quotation-container {
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.quotation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.quotation-header h2 {
+  color: #333;
+}
+
+.add-button {
+  background-color: #1e90ff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.add-button:hover {
+  background-color: #006cd1;
+}
+
+.quotation-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.quotation-table th,
+.quotation-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.quotation-table th {
+  background-color: #1e90ff;
+  color: white;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #333;
+}
+
+.edit-btn:hover {
+  background-color: #e0a800;
+}
+.view-btn {
+  background-color: #b66f04;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.view-btn:hover {
+  background-color: #1086d4;
+}

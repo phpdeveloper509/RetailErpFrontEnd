@@ -1,0 +1,255 @@
+/* Container */
+.quotation-form-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+}
+
+.quotation-form-container h2,
+.quotation-form-container h3,
+.modal h3 {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 20px;
+}
+
+/* Form Grid */
+.form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.form-grid > div {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.full-width {
+  flex: 1 1 100%;
+}
+
+/* Form Elements */
+label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #444;
+}
+
+input,
+select,
+textarea {
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Button */
+button {
+  padding: 8px 16px;
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  margin: 10px 5px 20px 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #115293;
+}
+
+/* Quotation Table */
+.quotation-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.quotation-table th,
+.quotation-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.quotation-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: 600;
+}
+
+.quotation-table input {
+  width: 60px;
+  padding: 5px;
+}
+
+/* Totals */
+.totals {
+  display: flex;
+  justify-content: flex-end;
+  gap: 30px;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal Box */
+.modal,
+.modal-box-1 {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 10px;
+  width: 800px;
+  max-width: 600px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow-y: auto;
+  max-height: 90vh;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Modal Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Item List */
+.item-list {
+  margin-top: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Item Row */
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.item-row > div {
+  flex: 1;
+  text-align: left;
+}
+
+.item-row button {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.item-row button:hover {
+  background-color: #1e7e34;
+}
+
+/* Close Button */
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  line-height: 28px;
+}
+
+.close-button:hover {
+  background: #c62828;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-grid {
+    flex-direction: column;
+  }
+
+  .totals {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .quotation-table th,
+  .quotation-table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+}
+.quotation-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  padding: 8px 0px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+.form-field textarea {
+  resize: vertical;
+}
