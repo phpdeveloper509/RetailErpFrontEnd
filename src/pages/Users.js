@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useCallback,useMemo, useState } from 'react';
 import axios from 'axios';
 import styles from './styles/Users.module.css';
 
@@ -6,18 +6,21 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', mobile: '', address: '', password: '', role: 'CASHIER' });
-
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+ 
   const token = localStorage.getItem('token');
-  const headers = { Authorization: `Bearer ${token}` };
+  const headers = useMemo(() => ({
+    Authorization: `Bearer ${token}`
+  }), [token]);
 
-  const loadUsers = async () => {
+  const loadUsers =useCallback(async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/users', { headers });
+      const res = await axios.get(`${API_BASE_URL}/api/users`, { headers });
       setUsers(res.data);
     } catch (err) {
       console.error('Error loading users:', err);
     }
-  };
+  },[API_BASE_URL, headers]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -29,7 +32,7 @@ const Users = () => {
 
   const handleAddUser = async () => {
     try {
-      await axios.post('http://localhost:8080/api/users', form, { headers });
+      await axios.post(`${API_BASE_URL}/api/users`, form, { headers });
       setForm({ name: '', email: '', mobile: '', address: '' , role: 'CASHIER', password: ''});
       setShowModal(false);
       loadUsers();
@@ -41,7 +44,7 @@ const Users = () => {
   const handleUpdateUser = async () => {
     console.log('Submitting user update:', editingUser.id, editForm);
     try {
-      await axios.put(`http://localhost:8080/api/users/update/${editingUser.id}`, editForm, { headers });
+      await axios.put(`${API_BASE_URL}/api/users/update/${editingUser.id}`, editForm, { headers });
       setEditingUser(null);
       loadUsers();
     } catch (err) {
@@ -75,7 +78,7 @@ const openEditModal = (user) => {
 
   useEffect(() => {
     loadUsers();
-  }, []);
+  }, [loadUsers]);
 
   return (
     <div className={styles['user-container']}>

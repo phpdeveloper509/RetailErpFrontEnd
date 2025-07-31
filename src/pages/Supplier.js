@@ -1,4 +1,4 @@
-import react, { useState, useEffect } from "react";
+import { useState,useCallback, useEffect } from "react";
 import axios from "axios";
 import './styles/Supplier.css';
 
@@ -17,7 +17,7 @@ const Supplier = () => {
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [currentId, setCurrentId] = useState(null);
-  
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
     const validate = () => {
       let errs = {};
       if (!form.suppCode) errs.suppCode = 'Supplier Code is required';
@@ -30,18 +30,18 @@ const Supplier = () => {
       setErrors(errs);
       return Object.keys(errs).length === 0;
     };
-  
-    const fetchSuppliers = async () => {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:8080/api/suppliers', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSuppliers(res.data);
-    };
-  
-    useEffect(() => {
-      fetchSuppliers();
-    }, []);
+    
+      const fetchSuppliers = useCallback(async () => {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`${API_BASE_URL}/api/suppliers`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSuppliers(res.data);
+      }, [API_BASE_URL]); // safe because no other dependencies used inside
+      
+      useEffect(() => {
+        fetchSuppliers();
+      }, [fetchSuppliers]);
   
     const openModal = (supplier = null) => {
       if (supplier) {
@@ -63,9 +63,9 @@ const Supplier = () => {
       const headers = { Authorization: `Bearer ${token}` };
       try {
         if (isEditing) {
-          await axios.put(`http://localhost:8080/api/suppliers/${currentId}`, form, { headers });
+          await axios.put(`${API_BASE_URL}/api/suppliers/${currentId}`, form, { headers });
         } else {
-          await axios.post('http://localhost:8080/api/suppliers', form, { headers });
+          await axios.post(`${API_BASE_URL}/api/suppliers`, form, { headers });
         }
         setShowModal(false);
         fetchSuppliers();

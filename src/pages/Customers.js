@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useCallback, useState } from 'react';
 import axios from 'axios';
 import './styles/Customers.css';
 
@@ -10,30 +10,30 @@ function Customers() {
   const [currentId, setCurrentId] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const [form, setForm] = useState({
     name: '', email: '', contact: '', address: ''
   });
 
-  useEffect(() => {
-    loadCustomers();
-  }, []);
-
-  const loadCustomers = async (page = 0, size = 5) => {
+  const loadCustomers = useCallback(async (page = 0, size = 5) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8080/api/customers?page=${page}&size=${size}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/customers?page=${page}&size=${size}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
   
       setCustomers(response.data.content || []);
       setTotalPages(response.data.totalPages || 0);
       setCurrentPage(response.data.number || 0);
-
     } catch (err) {
       console.error('Error loading customers:', err);
     }
-  };
+  }, [API_BASE_URL]); // include any external dependencies here
+  
+  useEffect(() => {
+    loadCustomers();
+  }, [loadCustomers]);
+  
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -59,9 +59,9 @@ function Customers() {
       const headers = { Authorization: `Bearer ${token}` };
 
       if (isEditing) {
-        await axios.put(`http://localhost:8080/api/customers/${currentId}`, form, { headers });
+        await axios.put(`${API_BASE_URL}/api/customers/${currentId}`, form, { headers });
       } else {
-        await axios.post('http://localhost:8080/api/customers', form, { headers });
+        await axios.post(`${API_BASE_URL}/api/customers`, form, { headers });
       }
 
       setShowModal(false);
@@ -78,7 +78,7 @@ function Customers() {
     try {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
-      await axios.delete(`http://localhost:8080/api/customers/${id}`, { headers });
+      await axios.delete(`${API_BASE_URL}/api/customers/${id}`, { headers });
       loadCustomers();
     } catch (err) {
       console.error('Error deleting customer:', err.response?.data || err.message);

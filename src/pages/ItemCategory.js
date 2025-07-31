@@ -1,41 +1,57 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useCallback, useState } from 'react';
 import axios from 'axios';
 import catStyle from './styles/ItemCategory.module.css';
 
 function ItemCategory() {
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({ name: '', description: '' });
-  
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  const token = localStorage.getItem('token');
-  const headers = { Authorization: `Bearer ${token}` };
-
-  const load = async () => {
-      const res = await axios.get('http://localhost:8080/api/itemcategories', {
-        headers: { Authorization: `Bearer ${token}` }
+  const load = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token'); // Moved inside
+      const res = await axios.get(`${API_BASE_URL}/api/itemcategories`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-    setCategories(res.data);
-  };
-
+      setCategories(res.data);
+    } catch (err) {
+      console.error('Error loading item Category:', err);
+    }
+  }, [API_BASE_URL]); // Now token is not needed here
+  
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const handleSubmit = async () => {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
   
     if (editingId) {
-      await axios.put(`http://localhost:8080/api/itemcategories/${editingId}`, form, { headers });
+      await axios.put(`${API_BASE_URL}/api/itemcategories/${editingId}`, form, { headers });
     } else {
-      await axios.post('http://localhost:8080/api/itemcategories', form, { headers });
+      await axios.post(`${API_BASE_URL}/api/itemcategories`, form, { headers });
     }
-
+  
     setShowModal(false);
     setForm({ name: '', description: '' });
     setEditingId(null);
     load();
   };
+  
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure?")) return;
+  
+    const token = localStorage.getItem('token');
+    await axios.delete(`${API_BASE_URL}/api/itemcategories/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  
+    load();
+  };
+  
 
   const openModal = (cat = null) => {
     if (cat) {
@@ -46,14 +62,6 @@ function ItemCategory() {
       setEditingId(null);
     }
     setShowModal(true);
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
-    await axios.delete(`http://localhost:8080/api/itemcategories/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-    load();
   };
 
   return (

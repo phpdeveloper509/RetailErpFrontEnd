@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState,useCallback, useEffect } from 'react';
 import axios from 'axios';
+import DataTable from 'react-data-table-component';
 import siteStyles from './styles/SiteMaster.module.css';
 
 const SiteMaster = () => {
@@ -15,6 +16,8 @@ const SiteMaster = () => {
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
+  const [search, setSearch] = useState('');
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const validate = () => {
     let errs = {};
@@ -29,17 +32,21 @@ const SiteMaster = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const fetchSites = async () => {
+  const fetchSites = useCallback(async () => {
+    
     const token = localStorage.getItem('token');
-    const res = await axios.get('http://localhost:8080/api/sites', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setSites(res.data);
-  };
-
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/sites`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSites(res.data);
+    } catch (err) {
+      console.error('Error fetching sites:', err);
+    }
+  },[API_BASE_URL]);
   useEffect(() => {
     fetchSites();
-  }, []);
+  }, [fetchSites]);
 
   const openModal = (site = null) => {
     if (site) {
@@ -61,9 +68,9 @@ const SiteMaster = () => {
     const headers = { Authorization: `Bearer ${token}` };
     try {
       if (isEditing) {
-        await axios.put(`http://localhost:8080/api/sites/${currentId}`, form, { headers });
+        await axios.put(`${API_BASE_URL}/api/sites/${currentId}`, form, { headers });
       } else {
-        await axios.post('http://localhost:8080/api/sites', form, { headers });
+        await axios.post(`${API_BASE_URL}/api/sites`, form, { headers });
       }
       setShowModal(false);
       fetchSites();
@@ -76,39 +83,102 @@ const SiteMaster = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const columns = [
+    { name: 'Code', selector: row => row.siteCode, sortable: true },
+    { name: 'Name', selector: row => row.siteName, sortable: true },
+    { name: 'Contact Person', selector: row => row.contactPerson, sortable: true },
+    { name: 'Email', selector: row => row.email, sortable: true },
+    { name: 'Phone', selector: row => row.phone, sortable: true },
+    {
+      name: 'Action',
+      cell: row => (
+        <button className={siteStyles['edit-btn']} onClick={() => openModal(row)}>
+          Edit
+        </button>
+      ),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true
+    }
+  ];
+
+  const filteredSites = sites.filter(site =>
+    Object.values(site).some(val =>
+      val?.toString().toLowerCase().includes(search.toLowerCase())
+    )
+  );
+
+  const customStyles = {
+    table: {
+      style: {
+        borderLeft: '1px solid #ccc',
+        borderRight: '1px solid #ccc',
+      },
+    },
+    headCells: {
+      style: {
+        fontWeight: 'bold',
+        backgroundColor: '#b1bda4',
+        color: '#333',
+        fontSize: '14px',
+        borderBottom: '1px solid #ddd'
+      }
+    },
+    rows: {
+      style: {
+        fontSize: '13px',
+        borderBottom: '1px solid #eee'
+      }
+    },
+    cells: {
+      style: {
+        borderRight: '1px solid #eee',
+        paddingLeft: '8px',
+        paddingRight: '8px'
+      }
+    }
+  };
+
   return (
     <div className={siteStyles['site-container']}>
       <div className={siteStyles['site-header']}>
         <h2>Site Master</h2>
-        <button onClick={() => openModal()}>+ Add Site</button>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Contact Person</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sites.map(site => (
-            <tr key={site.id}>
-              <td>{site.siteCode}</td>
-              <td>{site.siteName}</td>
-              <td>{site.contactPerson}</td>
-              <td>{site.email}</td>
-              <td>{site.phone}</td>
-              <td>
-                <button className={siteStyles['edit-btn']} onClick={() => openModal(site)}>Edit</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <DataTable
+        title="Sites"
+        columns={columns}
+        data={filteredSites}
+        pagination
+        highlightOnHover
+        customStyles={customStyles}
+        subHeader
+        subHeaderComponent={
+          <div style={{ width: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '6px' }}>
+              <button onClick={() => openModal()} className={siteStyles['add-btn']}>
+                + Add Site
+              </button>
+            </div>
+            <div>
+              <input
+                type="text"
+                placeholder="Search..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{
+                  height: '10px',
+                  padding: '6px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                  width: '175px'
+                }}
+              />
+            </div>
+          </div>
+        }
+        
+      />
 
       {showModal && (
         <div className={siteStyles['modal']}>

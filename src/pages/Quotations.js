@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useCallback, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './styles/Quotations.css';
 
 function QuotationList() {
   const [quotations, setQuotations] = useState([]);
-  const [filters, setFilters] = useState({ vendor: '', status: '', date: '' });
+  const [filters] = useState({});
   const navigate = useNavigate();
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-  const loadQuotations = async () => {
+  const loadQuotations = useCallback(async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(`http://localhost:8080/api/quotations`, {
+      const response = await axios.get(`${API_BASE_URL}/api/quotations`, {
         params: filters,
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -19,12 +20,12 @@ function QuotationList() {
     } catch (error) {
       console.error('Failed to load quotations:', error);
     }
-  };
+  }, [API_BASE_URL, filters]);
 
   useEffect(() => {
     loadQuotations();
-  }, [filters]);
-
+  }, [loadQuotations]);
+  
   const handleEdit = (id) => {
     navigate(`/quotation/edit/${id}`);
   };
@@ -66,5 +67,4 @@ function QuotationList() {
     </div>
   );
 }
-
 export default QuotationList;

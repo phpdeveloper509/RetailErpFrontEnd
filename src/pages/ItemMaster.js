@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useCallback, useState } from 'react';
 import axios from 'axios';
 import itmStyles from './styles/ItemMaster.module.css';
 
@@ -7,6 +7,7 @@ function ItemMaster() {
   const [isEdit, setIsEdit] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [categories, setCategories] = useState([]);
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const [units, setUnits] = useState([]);
   const [form, setForm] = useState({
     itemCode: '',
@@ -17,24 +18,26 @@ function ItemMaster() {
   });
 
   const [showModal, setShowModal] = useState(false);
-
-  const token = localStorage.getItem('token');
-  const headers = { Authorization: `Bearer ${token}` };
-
-  const loadData = async () => {
+  const loadData = useCallback (async () => {
+    try {
+      const token = localStorage.getItem('token'); // Moved inside
+      const headers = { Authorization: `Bearer ${token}` };
     const [itemRes, catRes, unitRes] = await Promise.all([
-      axios.get('http://localhost:8080/api/items', { headers }),
-      axios.get('http://localhost:8080/api/itemcategories', { headers }),
-      axios.get('http://localhost:8080/api/units', { headers })
+      axios.get(`${API_BASE_URL}/api/items`, { headers }),
+      axios.get(`${API_BASE_URL}/api/itemcategories`, { headers }),
+      axios.get(`${API_BASE_URL}/api/units`, { headers })
     ]);
     setItems(itemRes.data);
     setCategories(catRes.data);
     setUnits(unitRes.data);
-  };
+  }catch(err){
+    console.error('Error loading Item Master:', err);
+  }
+  }, [API_BASE_URL]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -56,9 +59,13 @@ function ItemMaster() {
   
     try {
       if (isEdit && editingId) {
-        await axios.put(`http://localhost:8080/api/items/${editingId}`, payload, { headers });
+        const token = localStorage.getItem('token'); // Moved inside
+        const headers = { Authorization: `Bearer ${token}` };
+        await axios.put(`${API_BASE_URL}/api/items/${editingId}`, payload, { headers });
       } else {
-        await axios.post('http://localhost:8080/api/items', payload, { headers });
+        const token = localStorage.getItem('token'); // Moved inside
+        const headers = { Authorization: `Bearer ${token}` };
+        await axios.post(`${API_BASE_URL}/api/items`, payload, { headers });
       }
   
       setShowModal(false);
@@ -89,7 +96,7 @@ function ItemMaster() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
     const token = localStorage.getItem('token');
-    await axios.delete(`http://localhost:8080/api/items/${id}`, {
+    await axios.delete(`${API_BASE_URL}/api/items/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     loadData();

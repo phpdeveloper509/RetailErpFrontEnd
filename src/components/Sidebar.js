@@ -5,7 +5,6 @@ import {
   LayoutDashboard,
   ShoppingCart,
   Package,
-  Users2,
   LogOut,
   UserCog,
   Users,

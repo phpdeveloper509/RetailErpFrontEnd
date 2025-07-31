@@ -1,33 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useCallback, useState } from 'react';
 import axios from 'axios';
 import unitStyle from './styles/ItemCategory.module.css';
 
 function UnitMaster() {
   const [units, setUnits] = useState([]);
   const [form, setForm] = useState({ unitName: '', unitDescription: '' });
-  
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
-  const load = async () => {
-      const res = await axios.get('http://localhost:8080/api/units', {
+  const load = useCallback(async () => {
+      const res = await axios.get(`${API_BASE_URL}/api/units`, {
         headers: { Authorization: `Bearer ${token}` }
       });
     setUnits(res.data);
-  };
+  },[API_BASE_URL,token]);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const handleSubmit = async () => {
   
     if (editingId) {
-      await axios.put(`http://localhost:8080/api/units/${editingId}`, form, { headers });
+      await axios.put(`${API_BASE_URL}/api/units/${editingId}`, form, { headers });
     } else {
-      await axios.post('http://localhost:8080/api/units', form, { headers });
+      await axios.post(`${API_BASE_URL}/api/units`, form, { headers });
     }
 
     setShowModal(false);
@@ -49,7 +49,7 @@ function UnitMaster() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure?")) return;
-    await axios.delete(`http://localhost:8080/api/units/${id}`, {
+    await axios.delete(`${API_BASE_URL}/api/units/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
     load();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useCallback, useState } from 'react';
 import axios from 'axios';
 import './styles/Customers.css';
 
@@ -7,26 +7,25 @@ function Vendors() {
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
-
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const [form, setForm] = useState({
     name: '', email: '', contact: '', address: ''
   });
 
-  useEffect(() => {
-    loadVendors();
-  }, []);
-
-  const loadVendors = async () => {
+  const loadVendors = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
-      const res = await axios.get('http://localhost:8080/api/vendors', { headers });
+      const res = await axios.get(`${API_BASE_URL}/api/vendors`, { headers });
       setVendors(res.data);
     } catch (err) {
       console.error('Error loading vendors:', err.response?.data || err.message);
     }
-  };
+  }, [API_BASE_URL]);
 
+  useEffect(() => {
+    loadVendors();
+  }, [loadVendors]);
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -50,9 +49,9 @@ function Vendors() {
       const headers = { Authorization: `Bearer ${token}` };
 
       if (isEditing) {
-        await axios.put(`http://localhost:8080/api/vendors/${currentId}`, form, { headers });
+        await axios.put(`${API_BASE_URL}/api/vendors/${currentId}`, form, { headers });
       } else {
-        await axios.post('http://localhost:8080/api/vendors', form, { headers });
+        await axios.post(`${API_BASE_URL}/api/vendors`, form, { headers });
       }
 
       setShowModal(false);
@@ -69,7 +68,7 @@ function Vendors() {
     try {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
-      await axios.delete(`http://localhost:8080/api/vendors/${id}`, { headers });
+      await axios.delete(`${API_BASE_URL}/api/vendors/${id}`, { headers });
       loadVendors();
     } catch (err) {
       console.error('Error deleting vendor:', err.response?.data || err.message);

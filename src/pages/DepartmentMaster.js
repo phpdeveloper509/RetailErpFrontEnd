@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useCallback, useState } from 'react';
 import axios from 'axios';
 import deptStyle from './styles/DepartmentMaster.module.css';
 
@@ -6,6 +6,7 @@ const DepartmentMaster = () => {
   const [departments, setDepartments] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const [form, setForm] = useState({
     departmentName: '',
     description: '',
@@ -16,17 +17,21 @@ const DepartmentMaster = () => {
   });
   const [currentId, setCurrentId] = useState(null);
 
-  useEffect(() => {
-    loadDepartments();
-  }, []);
-
-  const loadDepartments = async () => {
+  const loadDepartments = useCallback(async () => {
+    try {
     const token = localStorage.getItem('token');
-    const res = await axios.get('http://localhost:8080/api/departments', {
+    const res = await axios.get(`${API_BASE_URL}/api/departments`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     setDepartments(res.data);
-  };
+  } catch (err) {
+    console.error('Error loading customers:', err);
+  }
+}, [API_BASE_URL]); 
+
+useEffect(() => {
+  loadDepartments();
+}, [loadDepartments]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -56,8 +61,8 @@ const DepartmentMaster = () => {
     const token = localStorage.getItem('token');
     const headers = { Authorization: `Bearer ${token}` };
     const url = isEditing
-      ? `http://localhost:8080/api/departments/${currentId}`
-      : 'http://localhost:8080/api/departments';
+      ? `${API_BASE_URL}/api/departments/${currentId}`
+      : `${API_BASE_URL}/api/departments`;
 
     const method = isEditing ? axios.put : axios.post;
 

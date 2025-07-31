@@ -7,14 +7,14 @@ const QuotationView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quotation, setQuotation] = useState(null);
-
-  const token = localStorage.getItem('token');
-  const headers = { Authorization: `Bearer ${token}` };
-
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+ 
   useEffect(() => {
     const loadQuotation = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/quotations/${id}`, { headers });
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        const res = await axios.get(`${API_BASE_URL}/api/quotations/${id}`, { headers });
         setQuotation(res.data);
       } catch (err) {
         alert('Failed to load quotation');
@@ -22,7 +22,7 @@ const QuotationView = () => {
       }
     };
     loadQuotation();
-  }, [id]);
+  }, [API_BASE_URL,id]);
 
   const calculateTotals = () => {
     let totalTaxable = 0, tax = 0;
@@ -44,7 +44,6 @@ const QuotationView = () => {
   };
 
   if (!quotation) return <div>Loading...</div>;
-
   const { totalTaxable, tax, netTotal } = calculateTotals();
 
   return (
@@ -114,5 +113,4 @@ const QuotationView = () => {
     </div>
   );
 };
-
 export default QuotationView;

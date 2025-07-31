@@ -9,15 +9,15 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:8080/auth/login', { email, password });
+      const res = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
       login(res.data.token, res.data.role);
       navigate('/');
     } catch (err) {
-      alert('Invalid credentials');
+      alert('Invalid credentials. Please enter correct details');
     }
   };
 

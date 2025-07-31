@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect,useCallback, useState } from 'react';
 import axios from 'axios';
 import './styles/QuotationForm.css';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 const QuotationForm = ({ isEdit }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const [suppliers, setSuppliers] = useState([]);
   const [itemsMaster, setItemsMaster] = useState([]);
   const [showItemModal, setShowItemModal] = useState(false);
@@ -18,31 +18,26 @@ const QuotationForm = ({ isEdit }) => {
     items: []
   });
 
-  const token = localStorage.getItem('token');
-  const headers = { Authorization: `Bearer ${token}` };
-
-  useEffect(() => {
-    loadSuppliers();
-    loadItemsMaster();
-    if (isEdit && id) {
-      loadQuotation(id);
-    }
-  }, [id]);
-
-  const loadSuppliers = async () => {
-    const res = await axios.get('http://localhost:8080/api/suppliers', { headers });
+  const loadSuppliers = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    const res = await axios.get(`${API_BASE_URL}/api/suppliers`, { headers });
     setSuppliers(res.data);
-  };
-
-  const loadItemsMaster = async () => {
-    const res = await axios.get('http://localhost:8080/api/items', { headers });
+  }, [API_BASE_URL]);
+  
+  const loadItemsMaster = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    const res = await axios.get(`${API_BASE_URL}/api/items`, { headers });
     setItemsMaster(res.data);
-  };
-
-  const loadQuotation = async (id) => {
-    const res = await axios.get(`http://localhost:8080/api/quotations/${id}`, { headers });
+  }, [API_BASE_URL]);
+  
+  const loadQuotation = useCallback(async (id) => {
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
+    const res = await axios.get(`${API_BASE_URL}/api/quotations/${id}`, { headers });
     const q = res.data;
-
+  
     setForm({
       quotationNumber: q.quotationNumber || '',
       quotationDate: q.quotationDate || '',
@@ -58,7 +53,16 @@ const QuotationForm = ({ isEdit }) => {
         tax: i.tax
       })) || []
     });
-  };
+  }, [API_BASE_URL]);
+  
+  useEffect(() => {
+    loadSuppliers();
+    loadItemsMaster();
+    if (isEdit && id) {
+      loadQuotation(id);
+    }
+  }, [isEdit, id, loadSuppliers, loadItemsMaster, loadQuotation]);
+  
 
   const handleItemChange = (index, field, value) => {
     const updated = [...form.items];
@@ -129,9 +133,13 @@ const QuotationForm = ({ isEdit }) => {
 
     try {
       if (isEdit) {
-        await axios.put(`http://localhost:8080/api/quotations/${id}`, payload, { headers });
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        await axios.put(`${API_BASE_URL}/api/quotations/${id}`, payload, { headers });
       } else {
-        await axios.post('http://localhost:8080/api/quotations', payload, { headers });
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        await axios.post(`${API_BASE_URL}/api/quotations`, payload, { headers });
       }
       navigate('/quotations');
     } catch (err) {

@@ -4,8 +4,7 @@ import './styles/Product.css';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const [form, setForm] = useState({ name: '', price: '', stock: '' });
-
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
   const token = localStorage.getItem('token');
 
   const headers = {
@@ -14,30 +13,16 @@ const Products = () => {
 
   const loadProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/products', { headers });
+      const res = await axios.get(`${API_BASE_URL}/api/products`, { headers });
       setProducts(res.data);
     } catch (err) {
       console.error('Error loading products:', err);
     }
   };
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleAddProduct = async () => {
-    try {
-      await axios.post('http://localhost:8080/api/products', form, { headers });
-      setForm({ name: '', price: '', stock: '' });
-      loadProducts();
-    } catch (err) {
-      console.error('Error adding product:', err);
-    }
-  };
-
+  
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/products/${id}`, { headers });
+      await axios.delete(`${API_BASE_URL}/api/products/${id}`, { headers });
       loadProducts();
     } catch (err) {
       console.error('Error deleting product:', err);
@@ -45,6 +30,8 @@ const Products = () => {
   };
 
   useEffect(() => {
+    const loadProducts = async () => {
+      };
     loadProducts();
   }, []);
 
